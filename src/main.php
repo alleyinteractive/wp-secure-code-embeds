@@ -16,7 +16,9 @@ function main(): void {
 	$plugin = new Group(
 		new Features\Register_Block_Manifest(),
 		new Features\Load_Entries( cache: 'local' !== wp_get_environment_type() ),
-		// Add features here.
+		new Features\Authoring_Capability(),
+		new Features\Code_Embed_Post_Type(),
+		new Features\Register_Meta(),
 	);
 
 	/*

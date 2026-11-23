@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wp-secure-code-embeds/code-embed-fields",
+	"version": "0.1.0",
+	"title": "Code Embed Fields",
+	"category": "embed",
+	"icon": "editor-code",
+	"description": "Edit the head and body code of a code embed.",
+	"textdomain": "wp-secure-code-embeds",
+	"supports": {
+		"html": false,
+		"inserter": false,
+		"multiple": false,
+		"reusable": false
+	},
+	"usesContext": [ "postType" ],
+	"editorScript": "file:index.ts",
+	"editorStyle": "file:index.css"
+}
