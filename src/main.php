@@ -21,7 +21,6 @@ function main(): void {
 		new Features\Register_Meta(),
 		new Features\Code_Embed_Block_Settings(),
 		new Features\Inject_Head_Content(),
-		new Features\Full_Width_Page_Template(),
 	);
 
 	/*

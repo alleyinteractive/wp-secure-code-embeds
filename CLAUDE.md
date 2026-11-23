@@ -90,7 +90,6 @@ The plugin's purpose: administrators author raw head/body code in a private post
 - `Code_Embed_Post_Type` — registers `secure_code_embed`, locks its editor to the `code-embed-fields` block, and shows meta on the revisions screen.
 - `Code_Embed_Block_Settings` — passes settings to the picker block's editor script, including whether it can be inserted on the current screen.
 - `Inject_Head_Content` — parses the page's blocks (nested blocks and synced patterns included) once per request and prints each entry's head code once on `wp_head`.
-- `Full_Width_Page_Template` — block template for block themes, `templates/code-embed-full-width.php` for classic themes.
 - Blocks: `blocks/code-embed` (picker, renders body code) and `blocks/code-embed-fields` (editor-only, edits meta).
 
 Head and body code are intentionally stored and output without sanitization or escaping. Don't add either.
@@ -110,7 +109,7 @@ Dynamic blocks live in `blocks/<name>/` (scaffolded by `npm run create-block`).
 - Base class: `tests/TestCase.php` extends `Mantle\Testkit\Test_Case` and uses `Prevent_Remote_Requests`. New tests should extend this, not `Test_Case` directly.
 - `tests/bootstrap.php` uses `Mantle\Testing\manager()` with `maybe_rsync_plugin()` — the test runner rsyncs this plugin into a WordPress install before booting.
 - Tests live in `tests/Feature/`. Add a `tests/Unit/` directory and a matching `<testsuite>` in `phpunit.xml` if unit tests are needed. The feature scaffolder generates tests into `tests/Feature/`.
-- Run `npm run build` before PHP tests; block rendering tests skip when blocks aren't built. `tests/fixtures/themes/classic-fixture` is a minimal classic theme for template tests.
+- Run `npm run build` before PHP tests; block rendering tests skip when blocks aren't built.
 - When the plugin sits inside another WordPress install, Mantle boots that install instead of a fresh one. Copy the plugin outside it (excluding `node_modules`) and run `WP_CORE_DIR=/some/tmp/wordpress vendor/bin/phpunit` there.
 
 ## Conventions to respect

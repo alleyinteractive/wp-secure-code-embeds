@@ -84,15 +84,7 @@ On the front end:
 - Body content renders, unescaped, at each block's position.
 - Nothing is output on password-protected pages until the password is entered,
   or in feeds.
-
-### Full-width page template
-
-The plugin registers an optional **Full Width (Code Embeds)** page template
-with the site header, the site footer, and a full-width content area with no
-sidebar, so a Code Embed block can take over the content area. Block themes get
-a block template that uses the theme's `header` and `footer` template parts.
-Classic themes get a PHP template that calls `get_header()` and `get_footer()`.
-The Code Embed block works on pages using any template.
+- The Code Embed block works on pages using any template.
 
 ### Permissions
 
@@ -117,9 +109,9 @@ which requires the authoring capability.
 ### Filters
 
 `wp_secure_code_embeds_allowed_post_types` sets the post types where the Code
-Embed block can be inserted and rendered, where head content is injected, and
-which can use the full-width template. It defaults to `[ 'page' ]`, which keeps
-raw code out of feeds and syndicated content.
+Embed block can be inserted and rendered, and where head content is injected.
+It defaults to `[ 'page' ]`, which keeps raw code out of feeds and syndicated
+content.
 
 ```php
 add_filter(
