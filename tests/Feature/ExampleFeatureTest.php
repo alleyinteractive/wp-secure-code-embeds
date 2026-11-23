@@ -1,13 +1,13 @@
 <?php
 /**
- * Create WordPress Plugin Tests: Example Feature Test
+ * Secure Code Embeds Tests: Example Feature Test
  *
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
-namespace Alley\WP\Create_WordPress_Plugin\Tests\Feature;
+namespace Alley\WP\Secure_Code_Embeds\Tests\Feature;
 
-use Alley\WP\Create_WordPress_Plugin\Tests\TestCase;
+use Alley\WP\Secure_Code_Embeds\Tests\TestCase;
 
 /**
  * A test suite for an example feature.

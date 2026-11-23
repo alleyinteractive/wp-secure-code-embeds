@@ -1,17 +1,17 @@
 {
-  "name": "alleyinteractive/create-wordpress-plugin",
-  "description": "A skeleton WordPress plugin",
+  "name": "alleyinteractive/wp-secure-code-embeds",
+  "description": "A WordPress plugin to allow authors and editors to securely embed admin-approved code via the block editor",
   "type": "wordpress-plugin",
   "keywords": [
     "alleyinteractive",
-    "create-wordpress-plugin"
+    "wp-secure-code-embeds"
   ],
-  "homepage": "https://github.com/alleyinteractive/create-wordpress-plugin",
+  "homepage": "https://github.com/alleyinteractive/wp-secure-code-embeds",
   "license": "GPL-2.0-or-later",
   "authors": [
     {
-      "name": "author_name",
-      "email": "email@domain.com"
+      "name": "Alley",
+      "email": "info@alley.com"
     }
   ],
   "require": {
@@ -36,13 +36,13 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Alley\\WP\\Create_WordPress_Plugin\\Tests\\": "tests"
+      "Alley\\WP\\Secure_Code_Embeds\\Tests\\": "tests"
     }
   },
   "extra": {
     "wordpress-autoloader": {
       "autoload": {
-        "Alley\\WP\\Create_WordPress_Plugin\\": "src"
+        "Alley\\WP\\Secure_Code_Embeds\\": "src"
       }
     }
   },

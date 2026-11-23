@@ -1,22 +1,22 @@
 <?php
 /**
- * Plugin Name: Create WordPress Plugin
- * Plugin URI: https://github.com/alleyinteractive/create-wordpress-plugin
- * Description: A skeleton WordPress plugin
+ * Plugin Name: Secure Code Embeds
+ * Plugin URI: https://github.com/alleyinteractive/wp-secure-code-embeds
+ * Description: A WordPress plugin to allow authors and editors to securely embed admin-approved code via the block editor
  * Version: 0.0.0
- * Author: author_name
- * Author URI: https://github.com/alleyinteractive/create-wordpress-plugin
+ * Author: Alley
+ * Author URI: https://github.com/alleyinteractive/wp-secure-code-embeds
  * Requires at least: 7.1
  * Requires PHP: 8.4
  * Tested up to: 7.1
  *
- * Text Domain: create-wordpress-plugin
+ * Text Domain: wp-secure-code-embeds
  * Domain Path: /languages/
  *
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
-namespace Alley\WP\Create_WordPress_Plugin;
+namespace Alley\WP\Secure_Code_Embeds;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -25,9 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Root directory to this plugin.
  */
-define( 'CREATE_WORDPRESS_PLUGIN_DIR', __DIR__ );
-
-/* Start Composer Loader */
+define( 'WP_SECURE_CODE_EMBEDS_DIR', __DIR__ );
 
 // Check if Composer is installed (remove if Composer is not required for your plugin).
 if ( ! file_exists( __DIR__ . '/vendor/wordpress-autoload.php' ) ) {
@@ -41,7 +39,7 @@ if ( ! file_exists( __DIR__ . '/vendor/wordpress-autoload.php' ) ) {
 			function () {
 				?>
 				<div class="notice notice-error">
-					<p><?php esc_html_e( 'Composer is not installed and create-wordpress-plugin cannot load. Try using a `*-built` branch if the plugin is being loaded as a submodule.', 'create-wordpress-plugin' ); ?></p>
+					<p><?php esc_html_e( 'Composer is not installed and wp-secure-code-embeds cannot load. Try using a `*-built` branch if the plugin is being loaded as a submodule.', 'wp-secure-code-embeds' ); ?></p>
 				</div>
 				<?php
 			}
@@ -53,8 +51,6 @@ if ( ! file_exists( __DIR__ . '/vendor/wordpress-autoload.php' ) ) {
 	// Load Composer dependencies.
 	require_once __DIR__ . '/vendor/wordpress-autoload.php';
 }
-
-/* End Composer Loader */
 
 // Load the plugin's main files.
 require_once __DIR__ . '/src/assets.php';

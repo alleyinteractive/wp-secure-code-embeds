@@ -1,16 +1,16 @@
 {
-  "name": "create-wordpress-plugin",
+  "name": "wp-secure-code-embeds",
   "license": "GPL-2.0-or-later",
-  "main": "plugin.php",
+  "main": "wp-secure-code-embeds.php",
   "engines": {
     "node": "24",
     "npm": "11"
   },
   "scripts": {
     "build": "alley-build build --blocks-manifest",
-    "create-block": "npx @alleyinteractive/create-block@latest -n create-wordpress-plugin --skip-registration",
-    "create-entry": "npx @alleyinteractive/create-entry@latest -n create-wordpress-plugin -t create-wordpress-plugin",
-    "create-slotfill": "npx @alleyinteractive/create-entry -s -n create-wordpress-plugin -t create-wordpress-plugin",
+    "create-block": "npx @alleyinteractive/create-block@latest -n wp-secure-code-embeds --skip-registration",
+    "create-entry": "npx @alleyinteractive/create-entry@latest -n wp-secure-code-embeds -t wp-secure-code-embeds",
+    "create-slotfill": "npx @alleyinteractive/create-entry -s -n wp-secure-code-embeds -t wp-secure-code-embeds",
     "check-types": "tsc --noEmit",
     "eslint": "eslint --ext .jsx --ext .js --ext .ts --ext .tsx .",
     "eslint:fix": "eslint --ext .jsx --ext .js --ext .ts --ext .tsx . --fix",

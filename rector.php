@@ -3,7 +3,7 @@
  * Rector Configuration
  *
  * @link https://getrector.com/documentation
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
 declare(strict_types=1);

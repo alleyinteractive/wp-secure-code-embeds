@@ -2,16 +2,16 @@
 /**
  * Load_Entries class file
  *
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
 declare(strict_types=1);
 
-namespace Alley\WP\Create_WordPress_Plugin\Features;
+namespace Alley\WP\Secure_Code_Embeds\Features;
 
 use Alley\WP\Types\Feature;
 
-use function Alley\WP\Create_WordPress_Plugin\validate_path;
+use function Alley\WP\Secure_Code_Embeds\validate_path;
 
 /**
  * Load the built entries from the build directory.
@@ -51,17 +51,17 @@ class Load_Entries implements Feature {
 			 *
 			 * @var string[]|false
 			 */
-			$cache = apcu_fetch( 'create_wordpress_plugin_entries' );
+			$cache = apcu_fetch( 'wp_secure_code_embeds_entries' );
 
 			if ( is_array( $cache ) ) {
 				return $cache;
 			}
 		}
 
-		$files = glob( CREATE_WORDPRESS_PLUGIN_DIR . '/build/**/index.php' ) ?: [];
+		$files = glob( WP_SECURE_CODE_EMBEDS_DIR . '/build/**/index.php' ) ?: [];
 
 		if ( $this->cache && function_exists( 'apcu_store' ) ) {
-			apcu_store( 'create_wordpress_plugin_entries', $files, HOUR_IN_SECONDS );
+			apcu_store( 'wp_secure_code_embeds_entries', $files, HOUR_IN_SECONDS );
 		}
 
 		return $files;

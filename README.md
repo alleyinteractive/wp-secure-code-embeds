@@ -1,35 +1,8 @@
-<!--delete-->
-# Create WordPress Plugin
+# Secure Code Embeds
 
-This is a skeleton WordPress plugin that can scaffold a WordPress plugin. This
-template includes a base plugin file, autoloaded PHP files, unit tests powered
-by [Mantle](https://mantle.alley.com/), front-end assets compiled via Webpack,
-and Continuous Integration [via GitHub Actions](.github/workflows). Actions are
-configured to test the plugin and also [build it for releases](https://github.com/alleyinteractive/action-release).
-The workflows will also create a `*-built` branch, too.
+Contributors: alleyinteractive
 
-The plugin supports front-end assets which can be enqueued inside
-`src/assets.php` or from within an entry points `index.php` file. For plugins
-that don't require front-end assets, the configuration script below will prompt
-you to delete the front-end files if you don't wish to use them.
-
-## Getting Started
-
-Follow these steps to get started:
-
-1. Press the "Use template" button at the top of this repo to create a new repo
-   with the contents of this skeleton.
-2. Run `make` (or `php ./configure.php`) to run a script that will replace all
-   placeholders throughout all the files.
-3. Have fun creating your plugin! 🎊
-
-<!--/delete-->
-
-# Create WordPress Plugin
-
-Contributors: author_username
-
-Tags: vendor_name, create-wordpress-plugin
+Tags: alleyinteractive, wp-secure-code-embeds
 
 Stable tag: 0.0.0
 
@@ -41,16 +14,16 @@ Requires PHP: 8.4
 
 License: GPL v2 or later
 
-[![Testing Suite](https://github.com/alleyinteractive/create-wordpress-plugin/actions/workflows/all-pr-tests.yml/badge.svg?branch=develop)](https://github.com/alleyinteractive/create-wordpress-plugin/actions/workflows/all-pr-tests.yml)
+[![Testing Suite](https://github.com/alleyinteractive/wp-secure-code-embeds/actions/workflows/all-pr-tests.yml/badge.svg?branch=develop)](https://github.com/alleyinteractive/wp-secure-code-embeds/actions/workflows/all-pr-tests.yml)
 
-A skeleton WordPress plugin.
+A WordPress plugin to allow authors and editors to securely embed admin-approved code via the block editor.
 
 ## Installation
 
 You can install the package via Composer:
 
 ```bash
-composer require alleyinteractive/create-wordpress-plugin
+composer require alleyinteractive/wp-secure-code-embeds
 ```
 
 ## Usage
@@ -58,7 +31,7 @@ composer require alleyinteractive/create-wordpress-plugin
 Activate the plugin in WordPress and use it like so:
 
 ```php
-$plugin = Create_WordPress_Plugin\Skeleton\Example_Plugin();
+$plugin = Create_WordPress_Plugin\Secure_Code_Embeds\Secure_Code_Embeds();
 $plugin->perform_magic();
 ```
 
@@ -102,7 +75,7 @@ The plugin supports registering post and term meta via JSON files located in the
 
 For more information on how to register meta via JSON files,
 [see the documentation](https://mantle.alley.com/docs/features/support/helpers#register_meta_from_file).
-<!--front-end-->
+
 ## The `entries` directory and entry points
 
 All directories created in the `entries` directory can serve as entry points and will be compiled with [@wordpress/scripts](https://github.com/WordPress/gutenberg/blob/trunk/packages/scripts/README.md#scripts) into the `build` directory with an accompanied `index.asset.php` asset map.
@@ -161,15 +134,15 @@ must include both the major and minor version (e.g., `7.0`). For example:
 ```sh
 npx wp-scripts packages-update --dist-tag=wp-7.0`
 ```
-<!--/front-end-->
+
 ## Testing
-<!--front-end-->
+
 Run `npm run test` to run Jest tests against JavaScript files. Run
 `npm run test:watch` to keep the test runner open and watching for changes.
 
 Run `npm run lint` to run ESLint against all JavaScript files. Linting will also
 happen when running development or production builds.
-<!--/front-end-->
+
 Run `composer test` to run tests against PHPUnit and the PHP code in the plugin.
 Unit testing code is written in PSR-4 format and can be found in the `tests`
 directory.
@@ -180,7 +153,7 @@ The plugin uses
 [action-release](https://github.com/alleyinteractive/action-release) via a
 [built release workflow](./.github/workflows/built-release.yml) to compile and
 tag releases. Whenever a new version is detected in the root plugin's headers in
-the `plugin.php` file or in the `composer.json` file, the workflow will
+the `wp-secure-code-embeds.php` file or in the `composer.json` file, the workflow will
 automatically build the plugin and tag it with a new version. The built tag will
 contain all the required front-end assets the plugin may require. This works
 well for publishing to WordPress.org or for submodule-ing.
@@ -189,7 +162,7 @@ When you are ready to release a new version of the plugin, you can run
 `npm run release`/`composer release` to start the process of setting up a new
 release. If you want to do this manually you can follow these steps:
 
-1. Change the `Version` in the `plugin.php` file to a new higher-level version.
+1. Change the `Version` in the `wp-secure-code-embeds.php` file to a new higher-level version.
 
 	```diff
 	- * Version: 0.0.0
@@ -213,7 +186,7 @@ This project is actively maintained by [Alley
 Interactive](https://github.com/alleyinteractive). Like what you see? [Come work
 with us](https://alley.com/careers/).
 
-- [author_name](https://github.com/author_username)
+- [Alley](https://github.com/alleyinteractive)
 - [All Contributors](../../contributors)
 
 ## License

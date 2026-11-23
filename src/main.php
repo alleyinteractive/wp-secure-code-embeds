@@ -2,10 +2,10 @@
 /**
  * The main plugin function
  *
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
-namespace Alley\WP\Create_WordPress_Plugin;
+namespace Alley\WP\Secure_Code_Embeds;
 
 use Alley\WP\Features\Group;
 

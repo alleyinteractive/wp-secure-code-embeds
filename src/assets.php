@@ -4,10 +4,10 @@
  *
  * phpcs:disable phpcs:ignore Squiz.PHP.CommentedOutCode.Found
  *
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
-namespace Alley\WP\Create_WordPress_Plugin;
+namespace Alley\WP\Secure_Code_Embeds;
 
 /**
  * Validate file paths to prevent a PHP error if a file doesn't exist.
@@ -29,7 +29,7 @@ function get_entry_dir_path( string $dir_entry_name, bool $dir = false ): string
 	// The relative path from the plugin root.
 	$asset_build_dir = "/build/{$dir_entry_name}/";
 	// Set the absolute file path from the root directory.
-	$asset_dir_path = CREATE_WORDPRESS_PLUGIN_DIR . $asset_build_dir;
+	$asset_dir_path = WP_SECURE_CODE_EMBEDS_DIR . $asset_build_dir;
 
 	if ( validate_path( $asset_dir_path ) ) {
 		// Negotiate the base path.

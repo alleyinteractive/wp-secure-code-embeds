@@ -1,13 +1,13 @@
 <?php
 /**
- * Create WordPress Plugin Tests: Example Unit Test
+ * Secure Code Embeds Tests: Example Unit Test
  *
- * @package create-wordpress-plugin
+ * @package wp-secure-code-embeds
  */
 
 declare(strict_types=1);
 
-namespace Alley\WP\Create_WordPress_Plugin\Tests\Unit;
+namespace Alley\WP\Secure_Code_Embeds\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 

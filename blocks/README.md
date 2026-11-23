@@ -17,7 +17,7 @@ using the `slug` field entered from the prompts when scaffolding the block.
 The script uses the
 [@alleyinteractive/create-block](https://github.com/alleyinteractive/alley-scripts/tree/main/packages/create-block)
 script with the `--namespace` flag for scaffolding block files with the plugin
-namespace of `create-wordpress-plugin`. See the `create-block` script in
+namespace of `wp-secure-code-embeds`. See the `create-block` script in
 `package.json`.
 
 For **dynamic blocks** the following files will be generated:
@@ -41,7 +41,7 @@ enqueued via `block.json` after block registration.
 After generating the block and building it with `npm run build`, the block will
 be added to a manifest at `build/blocks-manifest.php`. The manifest is
 configured to be loaded in the
-`Alley\WP\Create_WordPress_Plugin\Features\Register_Block_Manifest` feature.
+`Alley\WP\Secure_Code_Embeds\Features\Register_Block_Manifest` feature.
 
 Block attributes should be defined in the `block.json` file.
 [Learn more about block.json in the block editor handbook.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)
