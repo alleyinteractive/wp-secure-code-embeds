@@ -1,0 +1,21 @@
+.wp-block-wp-secure-code-embeds-code-embed {
+  .components-placeholder__fieldset {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .wp-secure-code-embeds__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .wp-secure-code-embeds__note {
+    font-style: italic;
+    margin: 0;
+  }
+
+  .components-notice {
+    margin: 0;
+  }
+}

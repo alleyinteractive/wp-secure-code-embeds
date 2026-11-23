@@ -57,6 +57,5 @@ require_once __DIR__ . '/src/assets.php';
 require_once __DIR__ . '/src/meta.php';
 require_once __DIR__ . '/src/main.php';
 
-register_post_meta_from_defs();
-register_term_meta_from_defs();
+// Meta is registered on `init` by the Register_Meta feature, after post types exist.
 main();

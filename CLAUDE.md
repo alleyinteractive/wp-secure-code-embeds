@@ -69,7 +69,7 @@ npm run scaffold         # run @alleyinteractive/scaffolder (reads .scaffolder/)
 ## Architecture
 
 ### Bootstrap flow
-`wp-secure-code-embeds.php` (the WordPress entry file) loads Composer's `vendor/wordpress-autoload.php` (from `alleyinteractive/composer-wordpress-autoloader`, which maps `Alley\WP\Secure_Code_Embeds\` → `src/`), then requires `src/assets.php`, `src/meta.php`, `src/main.php` and calls `main()`, `register_post_meta_from_defs()`, `register_term_meta_from_defs()`.
+`wp-secure-code-embeds.php` (the WordPress entry file) loads Composer's `vendor/wordpress-autoload.php` (from `alleyinteractive/composer-wordpress-autoloader`, which maps `Alley\WP\Secure_Code_Embeds\` → `src/`), then requires `src/assets.php`, `src/meta.php`, `src/main.php` and calls `main()`. Meta is registered by the `Register_Meta` feature on `init` (priority 20), after post types exist, because meta with `revisions_enabled` requires its post type to support revisions.
 
 If `vendor/` is absent but a parent project has already loaded Composer (i.e. the plugin is a Composer dependency), bootstrap continues silently; otherwise an admin notice is shown.
 
@@ -79,6 +79,21 @@ If `vendor/` is absent but a parent project has already loaded Composer (i.e. th
 Built-in features:
 - `Register_Block_Manifest` — registers blocks from the Gutenberg block manifest produced by `alley-build --blocks-manifest`. Handles WordPress 6.8+ (`wp_register_block_types_from_metadata_collection()`), 6.7 (`wp_register_block_metadata_collection()`), and older (individual `register_block_type()` calls) transparently.
 - `Load_Entries` — globs `build/**/index.php` and `require_once`s each. APCu caching is enabled in non-local environments (`cache: 'local' !== wp_get_environment_type()` in `main.php`); in local dev, the glob runs on every request.
+- `Register_Meta` — registers meta from `config/*.json` on `init`, priority 20.
+
+### Code embeds
+The plugin's purpose: administrators author raw head/body code in a private post type, and anyone who can edit pages places it with a picker block.
+
+- `src/class-code-embed.php` — constants (post type, capability, meta keys, block names) and helpers, including the `wp_secure_code_embeds_allowed_post_types` filter (default `[ 'page' ]`).
+- `src/class-code-embeds-rest-controller.php` — limits REST reads to users who can select entries.
+- `Authoring_Capability` — the single trust boundary: grants `manage_secure_code_embeds` to users with `manage_options`.
+- `Code_Embed_Post_Type` — registers `secure_code_embed`, locks its editor to the `code-embed-fields` block, and shows meta on the revisions screen.
+- `Code_Embed_Block_Settings` — passes settings to the picker block's editor script, including whether it can be inserted on the current screen.
+- `Inject_Head_Content` — parses the page's blocks (nested blocks and synced patterns included) once per request and prints each entry's head code once on `wp_head`.
+- `Full_Width_Page_Template` — block template for block themes, `templates/code-embed-full-width.php` for classic themes.
+- Blocks: `blocks/code-embed` (picker, renders body code) and `blocks/code-embed-fields` (editor-only, edits meta).
+
+Head and body code are intentionally stored and output without sanitization or escaping. Don't add either.
 
 ### Front-end entries
 Every directory under `entries/` is a webpack entry point compiled to `build/<name>/` with an `index.asset.php` dependency/version map. An optional `entries/<name>/index.php` is copied to `build/<name>/index.php` and auto-loaded by `Load_Entries` — that's how an entry registers/enqueues itself. Helpers in `src/assets.php` (`get_entry_asset_url`, `get_asset_dependency_array`, `get_asset_version`) read `index.asset.php` and resolve URLs.
@@ -95,6 +110,8 @@ Dynamic blocks live in `blocks/<name>/` (scaffolded by `npm run create-block`).
 - Base class: `tests/TestCase.php` extends `Mantle\Testkit\Test_Case` and uses `Prevent_Remote_Requests`. New tests should extend this, not `Test_Case` directly.
 - `tests/bootstrap.php` uses `Mantle\Testing\manager()` with `maybe_rsync_plugin()` — the test runner rsyncs this plugin into a WordPress install before booting.
 - Feature tests live in `tests/Feature/`; unit tests in `tests/Unit/`. The feature scaffolder generates tests into `tests/Feature/`.
+- Run `npm run build` before PHP tests; block rendering tests skip when blocks aren't built. `tests/fixtures/themes/classic-fixture` is a minimal classic theme for template tests.
+- When the plugin sits inside another WordPress install, Mantle boots that install instead of a fresh one. Copy the plugin outside it (excluding `node_modules`) and run `WP_CORE_DIR=/some/tmp/wordpress vendor/bin/phpunit` there.
 
 ## Conventions to respect
 
