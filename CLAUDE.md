@@ -52,8 +52,8 @@ composer lint:fix     # rector:fix + phpcbf
 composer serve        # wp-env start only (no webpack)
 ```
 
-Run a single PHPUnit test: `vendor/bin/phpunit --filter ExampleUnitTest`.
-Run a test suite: `vendor/bin/phpunit --testsuite Feature` or `--testsuite Unit`.
+Run a single PHPUnit test: `vendor/bin/phpunit --filter CodeEmbedOutputTest`.
+Run a test suite: `vendor/bin/phpunit --testsuite Feature`.
 
 **Scaffolding:**
 ```sh
@@ -109,7 +109,7 @@ Dynamic blocks live in `blocks/<name>/` (scaffolded by `npm run create-block`).
 - PSR-4: `Alley\WP\Secure_Code_Embeds\Tests\` → `tests/` (note: this is `autoload-dev`, not the runtime autoloader).
 - Base class: `tests/TestCase.php` extends `Mantle\Testkit\Test_Case` and uses `Prevent_Remote_Requests`. New tests should extend this, not `Test_Case` directly.
 - `tests/bootstrap.php` uses `Mantle\Testing\manager()` with `maybe_rsync_plugin()` — the test runner rsyncs this plugin into a WordPress install before booting.
-- Feature tests live in `tests/Feature/`; unit tests in `tests/Unit/`. The feature scaffolder generates tests into `tests/Feature/`.
+- Tests live in `tests/Feature/`. Add a `tests/Unit/` directory and a matching `<testsuite>` in `phpunit.xml` if unit tests are needed. The feature scaffolder generates tests into `tests/Feature/`.
 - Run `npm run build` before PHP tests; block rendering tests skip when blocks aren't built. `tests/fixtures/themes/classic-fixture` is a minimal classic theme for template tests.
 - When the plugin sits inside another WordPress install, Mantle boots that install instead of a fresh one. Copy the plugin outside it (excluding `node_modules`) and run `WP_CORE_DIR=/some/tmp/wordpress vendor/bin/phpunit` there.
 
