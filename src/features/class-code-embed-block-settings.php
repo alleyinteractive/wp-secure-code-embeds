@@ -9,15 +9,16 @@ declare(strict_types=1);
 
 namespace Alley\WP\Secure_Code_Embeds\Features;
 
-use Alley\WP\Secure_Code_Embeds\Code_Embed;
 use Alley\WP\Types\Feature;
 use WP_Screen;
+
+use function Alley\WP\Secure_Code_Embeds\allowed_post_types;
 
 /**
  * Passes settings to the picker block's editor script.
  *
  * The picker block can only be inserted in post types returned by
- * {@see Code_Embed::allowed_post_types()}. It stays registered everywhere so
+ * {@see \Alley\WP\Secure_Code_Embeds\allowed_post_types()}. It stays registered everywhere so
  * that an existing block still shows its placeholder in the editor.
  */
 final class Code_Embed_Block_Settings implements Feature {
@@ -32,7 +33,7 @@ final class Code_Embed_Block_Settings implements Feature {
 	 * Add the settings before the picker block's editor script.
 	 */
 	public function add_editor_settings(): void {
-		$handle = generate_block_asset_handle( Code_Embed::PICKER_BLOCK, 'editorScript' );
+		$handle = generate_block_asset_handle( 'wp-secure-code-embeds/code-embed', 'editorScript' );
 
 		if ( ! wp_script_is( $handle, 'registered' ) ) {
 			return;
@@ -56,9 +57,9 @@ final class Code_Embed_Block_Settings implements Feature {
 
 		return [
 			'adminUrl'  => admin_url(),
-			'canInsert' => '' !== $post_type && in_array( $post_type, Code_Embed::allowed_post_types(), true ),
-			'postType'  => Code_Embed::POST_TYPE,
-			'restBase'  => Code_Embed::REST_BASE,
+			'canInsert' => '' !== $post_type && in_array( $post_type, allowed_post_types(), true ),
+			'postType'  => 'secure_code_embed',
+			'restBase'  => 'secure-code-embeds',
 		];
 	}
 }

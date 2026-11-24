@@ -136,31 +136,6 @@ start` to start the front-end assets build process separately. The front-end
 assets will be compiled into the `build` directory and will be enqueued
 automatically by the plugin.
 
-## Registering Meta
-
-The plugin supports registering post and term meta via JSON files located in the
-`config` directory. Out of the box, the plugin will look for
-`config/post-meta.json` for post meta and `config/term-meta.json` for term meta.
-
-```json
-{
-  "$schema": "https://mantle.alley.com/schema/meta.json",
-  "example_meta_key": {
-    "post_types": "article",
-    "type": "string"
-  },
-  "another_meta_key": {
-    "post_types": [ "article", "page" ],
-    "type": "number",
-    "single": false,
-    "default": 0
-  }
-}
-```
-
-For more information on how to register meta via JSON files,
-[see the documentation](https://mantle.alley.com/docs/features/support/helpers#register_meta_from_file).
-
 ## The `entries` directory and entry points
 
 All directories created in the `entries` directory can serve as entry points and will be compiled with [@wordpress/scripts](https://github.com/WordPress/gutenberg/blob/trunk/packages/scripts/README.md#scripts) into the `build` directory with an accompanied `index.asset.php` asset map.

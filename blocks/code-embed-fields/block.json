@@ -14,7 +14,7 @@
 		"multiple": false,
 		"reusable": false
 	},
-	"usesContext": [ "postType" ],
+	"usesContext": [ "postId", "postType" ],
 	"editorScript": "file:index.ts",
 	"editorStyle": "file:index.css"
 }

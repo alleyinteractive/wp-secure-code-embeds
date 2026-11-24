@@ -17,7 +17,7 @@ A **skeleton/template WordPress plugin** maintained by Alley Interactive. Consum
 - Prefer Mantle APIs over custom implementations.
 - Ensure all PHP passes PHPStan level max.
 - Ensure all linting checks pass (phpcs/phpstan/rector for PHP; eslint/tsc for JS).
-- Post/term meta should be registered through `config/post-meta.json` and `config/term-meta.json` using `register_meta_from_file()`, not hard-coded in PHP.
+- Register post/term meta in PHP with `register_post_meta()`/`register_term_meta()`, in the feature that owns the object type.
 
 ## Common commands
 
@@ -69,7 +69,7 @@ npm run scaffold         # run @alleyinteractive/scaffolder (reads .scaffolder/)
 ## Architecture
 
 ### Bootstrap flow
-`wp-secure-code-embeds.php` (the WordPress entry file) loads Composer's `vendor/wordpress-autoload.php` (from `alleyinteractive/composer-wordpress-autoloader`, which maps `Alley\WP\Secure_Code_Embeds\` → `src/`), then requires `src/assets.php`, `src/meta.php`, `src/main.php` and calls `main()`. Meta is registered by the `Register_Meta` feature on `init` (priority 20), after post types exist, because meta with `revisions_enabled` requires its post type to support revisions.
+`wp-secure-code-embeds.php` (the WordPress entry file) loads Composer's `vendor/wordpress-autoload.php` (from `alleyinteractive/composer-wordpress-autoloader`, which maps `Alley\WP\Secure_Code_Embeds\` → `src/`), then requires `src/assets.php`, `src/functions.php`, `src/main.php` and calls `main()`.
 
 If `vendor/` is absent but a parent project has already loaded Composer (i.e. the plugin is a Composer dependency), bootstrap continues silently; otherwise an admin notice is shown.
 
@@ -79,18 +79,19 @@ If `vendor/` is absent but a parent project has already loaded Composer (i.e. th
 Built-in features:
 - `Register_Block_Manifest` — registers blocks from the Gutenberg block manifest produced by `alley-build --blocks-manifest`. Handles WordPress 6.8+ (`wp_register_block_types_from_metadata_collection()`), 6.7 (`wp_register_block_metadata_collection()`), and older (individual `register_block_type()` calls) transparently.
 - `Load_Entries` — globs `build/**/index.php` and `require_once`s each. APCu caching is enabled in non-local environments (`cache: 'local' !== wp_get_environment_type()` in `main.php`); in local dev, the glob runs on every request.
-- `Register_Meta` — registers meta from `config/*.json` on `init`, priority 20.
 
 ### Code embeds
 The plugin's purpose: administrators author raw head/body code in a private post type, and anyone who can edit pages places it with a picker block.
 
-- `src/class-code-embed.php` — constants (post type, capability, meta keys, block names) and helpers, including the `wp_secure_code_embeds_allowed_post_types` filter (default `[ 'page' ]`).
+- `src/functions.php` — `allowed_post_types()`, the single source for the `wp_secure_code_embeds_allowed_post_types` filter (default `[ 'page' ]`).
 - `src/class-code-embeds-rest-controller.php` — limits REST reads to users who can select entries.
 - `Authoring_Capability` — the single trust boundary: grants `manage_secure_code_embeds` to users with `manage_options`.
-- `Code_Embed_Post_Type` — registers `secure_code_embed`, locks its editor to the `code-embed-fields` block, and shows meta on the revisions screen.
+- `Code_Embed_Post_Type` — registers `secure_code_embed` and its head/body meta (labels included, revisioned), maps every capability (with `map_meta_cap` off) to `manage_secure_code_embeds`, locks its editor to the `code-embed-fields` block, and shows meta on the revisions screen.
 - `Code_Embed_Block_Settings` — passes settings to the picker block's editor script, including whether it can be inserted on the current screen.
 - `Inject_Head_Content` — parses the page's blocks (nested blocks and synced patterns included) once per request and prints each entry's head code once on `wp_head`.
-- Blocks: `blocks/code-embed` (picker, renders body code) and `blocks/code-embed-fields` (editor-only, edits meta).
+- Blocks: `blocks/code-embed` (picker; `render.php` decides whether body code is output) and `blocks/code-embed-fields` (editor-only, edits meta).
+
+Post type, meta keys, capability, and block names are string literals rather than shared constants.
 
 Head and body code are intentionally stored and output without sanitization or escaping. Don't add either.
 
@@ -101,7 +102,7 @@ Every directory under `entries/` is a webpack entry point compiled to `build/<na
 Dynamic blocks live in `blocks/<name>/` (scaffolded by `npm run create-block`).
 
 ### Meta
-`config/post-meta.json` and `config/term-meta.json` drive `register_meta_from_file()` from `mantle-framework/support`. Add meta by editing these JSON files — no PHP changes needed. Schema: `https://mantle.alley.com/schema/meta.json`.
+Meta is registered in PHP. `Code_Embed_Post_Type::register_meta()` registers the entry meta on `init`, after the post type, because meta with `revisions_enabled` requires its post type to support revisions.
 
 
 ### Tests
@@ -125,7 +126,7 @@ Dynamic blocks live in `blocks/<name>/` (scaffolded by `npm run create-block`).
 This plugin uses [Mantle](https://mantle.alley.com/) — Alley's WordPress framework — for its helpers, testing utilities, and support libraries. Prefer Mantle's APIs over hand-rolled equivalents when adding functionality:
 
 - **Testing:** Use Mantle Testkit (`Mantle\Testkit\Test_Case`) as the base, factories for fixture data (`static::factory()->post->create(...)`), HTTP testing helpers (`$this->get(...)`, `assertOk()`, etc.), request faking, and traits like `Prevent_Remote_Requests`, `Refresh_Database`, `Installs_Plugin`.
-- **Helpers:** Use `mantle-framework/support` for collections (`collect()`), strings (`Str::*`), arrays (`Arr::*`), and meta registration (`register_meta_from_file()`).
+- **Helpers:** Use `mantle-framework/support` for collections (`collect()`), strings (`Str::*`), and arrays (`Arr::*`).
 - **Database / Models:** Mantle's Eloquent-style models and query builders are preferred over raw `WP_Query` when data access gets complex.
 - **HTTP client, queues, events, scheduling:** Use Mantle's facades/services instead of re-implementing.
 

@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace Alley\WP\Secure_Code_Embeds\Features;
 
-use Alley\WP\Secure_Code_Embeds\Code_Embed;
 use Alley\WP\Types\Feature;
 use WP_Post;
+
+use function Alley\WP\Secure_Code_Embeds\allowed_post_types;
 
 /**
  * Outputs the head code of every code embed placed on the current page.
@@ -39,7 +40,7 @@ final class Inject_Head_Content implements Feature {
 	 * Print the head code for the code embeds on the current page.
 	 */
 	public function print_head_content(): void {
-		$post_types = Code_Embed::allowed_post_types();
+		$post_types = allowed_post_types();
 
 		if ( [] === $post_types || ! is_singular( $post_types ) ) {
 			return;
@@ -53,15 +54,15 @@ final class Inject_Head_Content implements Feature {
 		}
 
 		foreach ( $this->get_embed_ids( $post ) as $embed_id ) {
-			$embed = Code_Embed::get_published( $embed_id );
+			$embed = get_post( $embed_id );
 
-			if ( ! $embed instanceof WP_Post ) {
+			if ( ! $embed instanceof WP_Post || 'secure_code_embed' !== $embed->post_type || 'publish' !== $embed->post_status ) {
 				continue;
 			}
 
-			$head = Code_Embed::get_head( $embed );
+			$head = get_post_meta( $embed->ID, 'secure_code_embed_head', true );
 
-			if ( '' === trim( $head ) ) {
+			if ( ! is_string( $head ) || '' === trim( $head ) ) {
 				continue;
 			}
 
@@ -113,8 +114,8 @@ final class Inject_Head_Content implements Feature {
 			$attributes = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : [];
 			$block_name = $block['blockName'] ?? null;
 
-			if ( Code_Embed::PICKER_BLOCK === $block_name ) {
-				$embed_id = Code_Embed::get_block_embed_id( $attributes );
+			if ( 'wp-secure-code-embeds/code-embed' === $block_name ) {
+				$embed_id = isset( $attributes['embedId'] ) && is_numeric( $attributes['embedId'] ) ? (int) $attributes['embedId'] : 0;
 
 				if ( $embed_id > 0 ) {
 					$ids[] = $embed_id;

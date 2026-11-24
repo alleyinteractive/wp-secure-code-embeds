@@ -10,6 +10,7 @@ const BODY_META_KEY = 'secure_code_embed_body';
 
 interface EditProps {
   context: {
+    postId?: number;
     postType?: string;
   };
 }
@@ -24,8 +25,8 @@ type CodeEmbedMeta = Record<string, unknown>;
  *
  * @return {WPElement} Element to render.
  */
-export default function Edit({ context: { postType = 'secure_code_embed' } }: EditProps) {
-  const [rawMeta, setMeta] = useEntityProp('postType', postType, 'meta');
+export default function Edit({ context: { postId, postType = 'secure_code_embed' } }: EditProps) {
+  const [rawMeta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
   const meta = rawMeta as CodeEmbedMeta | undefined;
 
   const getValue = (key: string): string => {
@@ -39,7 +40,7 @@ export default function Edit({ context: { postType = 'secure_code_embed' } }: Ed
     <div {...useBlockProps()}>
       <Notice status="warning" isDismissible={false}>
         {__(
-          'Code saved here is output on the site exactly as written. It is not sanitized or escaped. Only save code you have reviewed and trust.',
+          'Code saved here is output on the site exactly as written. It is not sanitized or escaped. Only save code you reviewed and trust.',
           'wp-secure-code-embeds',
         )}
       </Notice>

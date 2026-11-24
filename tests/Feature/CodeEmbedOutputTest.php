@@ -7,10 +7,10 @@
 
 namespace Alley\WP\Secure_Code_Embeds\Tests\Feature;
 
-use Alley\WP\Secure_Code_Embeds\Code_Embed;
 use Alley\WP\Secure_Code_Embeds\Features\Code_Embed_Block_Settings;
 use Alley\WP\Secure_Code_Embeds\Features\Inject_Head_Content;
 use Alley\WP\Secure_Code_Embeds\Tests\TestCase;
+use WP_Block;
 use WP_Block_Type_Registry;
 
 /**
@@ -26,12 +26,12 @@ class CodeEmbedOutputTest extends TestCase {
 	protected function create_embed( string $name, string $status = 'publish' ): int {
 		return static::factory()->post->create(
 			[
-				'post_type'   => Code_Embed::POST_TYPE,
+				'post_type'   => 'secure_code_embed',
 				'post_status' => $status,
 				'post_title'  => $name,
 				'meta_input'  => [
-					Code_Embed::HEAD_META_KEY => "<style id=\"{$name}-head\">.{$name}{color:red}</style>",
-					Code_Embed::BODY_META_KEY => "<div class=\"{$name}\"><script>var {$name} = 1 && 2;</script></div>",
+					'secure_code_embed_head' => "<style id=\"{$name}-head\">.{$name}{color:red}</style>",
+					'secure_code_embed_body' => "<div class=\"{$name}\"><script>var {$name} = 1 && 2;</script></div>",
 				],
 			]
 		);
@@ -44,6 +44,27 @@ class CodeEmbedOutputTest extends TestCase {
 	 */
 	protected function picker( int $embed_id ): string {
 		return sprintf( '<!-- wp:wp-secure-code-embeds/code-embed {"embedId":%d} /-->', $embed_id );
+	}
+
+	/**
+	 * Render a picker block with the given block context.
+	 *
+	 * @param int                  $embed_id Entry ID.
+	 * @param array<string, mixed> $context  Block context.
+	 */
+	protected function render_picker( int $embed_id, array $context ): string {
+		$this->skip_unless_blocks_are_built();
+
+		return new WP_Block( parse_blocks( $this->picker( $embed_id ) )[0], $context )->render();
+	}
+
+	/**
+	 * Skip a test when the blocks have not been built and registered.
+	 */
+	protected function skip_unless_blocks_are_built(): void {
+		if ( ! WP_Block_Type_Registry::get_instance()->is_registered( 'wp-secure-code-embeds/code-embed' ) ) {
+			$this->markTestSkipped( 'Blocks are not built. Run `npm run build` first.' );
+		}
 	}
 
 	/**
@@ -163,7 +184,8 @@ class CodeEmbedOutputTest extends TestCase {
 		$post     = static::factory()->post->create( [ 'post_content' => $this->picker( $embed_id ) ] );
 
 		$this->assertSame( '', $this->head_for( $post ) );
-		$this->assertSame( '', Code_Embed::get_block_body( [ 'embedId' => $embed_id ], [ 'postType' => 'post' ] ) );
+		$this->assertSame( '', $this->render_picker( $embed_id, [ 'postType' => 'post' ] ) );
+		$this->assertStringContainsString( 'class="onpost"', $this->render_picker( $embed_id, [ 'postType' => 'page' ] ) );
 	}
 
 	public function test_allowed_post_types_can_be_filtered(): void {
@@ -173,7 +195,7 @@ class CodeEmbedOutputTest extends TestCase {
 		$post     = static::factory()->post->create( [ 'post_content' => $this->picker( $embed_id ) ] );
 
 		$this->assertStringContainsString( 'id="filtered-head"', $this->head_for( $post ) );
-		$this->assertStringContainsString( 'class="filtered"', Code_Embed::get_block_body( [ 'embedId' => $embed_id ], [ 'postType' => 'post' ] ) );
+		$this->assertStringContainsString( 'class="filtered"', $this->render_picker( $embed_id, [ 'postType' => 'post' ] ) );
 	}
 
 	public function test_head_content_is_not_output_for_password_protected_pages(): void {
@@ -189,9 +211,7 @@ class CodeEmbedOutputTest extends TestCase {
 	}
 
 	public function test_block_renders_body_unescaped(): void {
-		if ( ! WP_Block_Type_Registry::get_instance()->is_registered( Code_Embed::PICKER_BLOCK ) ) {
-			$this->markTestSkipped( 'Blocks are not built. Run `npm run build` first.' );
-		}
+		$this->skip_unless_blocks_are_built();
 
 		$embed_id = $this->create_embed( 'rendered' );
 		$page     = static::factory()->page->create( [ 'post_content' => $this->picker( $embed_id ) . $this->picker( $embed_id ) ] );
@@ -204,9 +224,7 @@ class CodeEmbedOutputTest extends TestCase {
 	}
 
 	public function test_page_request_outputs_head_and_body_code(): void {
-		if ( ! WP_Block_Type_Registry::get_instance()->is_registered( Code_Embed::PICKER_BLOCK ) ) {
-			$this->markTestSkipped( 'Blocks are not built. Run `npm run build` first.' );
-		}
+		$this->skip_unless_blocks_are_built();
 
 		$embed_id = $this->create_embed( 'fullpage' );
 		$page     = static::factory()->page->create(

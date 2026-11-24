@@ -18,7 +18,6 @@ function main(): void {
 		new Features\Load_Entries( cache: 'local' !== wp_get_environment_type() ),
 		new Features\Authoring_Capability(),
 		new Features\Code_Embed_Post_Type(),
-		new Features\Register_Meta(),
 		new Features\Code_Embed_Block_Settings(),
 		new Features\Inject_Head_Content(),
 	);

@@ -19,7 +19,7 @@
 		"align": [ "wide", "full" ],
 		"html": false
 	},
-	"usesContext": [ "postType" ],
+	"usesContext": [ "postId", "postType" ],
 	"editorScript": "file:index.ts",
 	"editorStyle": "file:index.css",
 	"render": "file:render.php"

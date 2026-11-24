@@ -9,14 +9,19 @@ declare(strict_types=1);
 
 namespace Alley\WP\Secure_Code_Embeds\Features;
 
-use Alley\WP\Secure_Code_Embeds\Code_Embed;
 use Alley\WP\Secure_Code_Embeds\Code_Embeds_REST_Controller;
 use Alley\WP\Types\Feature;
 use WP_Block_Editor_Context;
 use WP_Post;
 
 /**
- * Registers the private post type that stores code embed entries.
+ * Registers the private post type that stores code embed entries, and the meta
+ * that holds each entry's head and body code.
+ *
+ * Every capability for the post type, including the per-post `edit_post`,
+ * `read_post`, and `delete_post` checks, maps to the single
+ * `manage_secure_code_embeds` capability. {@see Authoring_Capability} decides
+ * who has it.
  */
 final class Code_Embed_Post_Type implements Feature {
 	/**
@@ -24,6 +29,7 @@ final class Code_Embed_Post_Type implements Feature {
 	 */
 	public function boot(): void {
 		add_action( 'init', $this->register_post_type( ... ) );
+		add_action( 'init', $this->register_meta( ... ) );
 		add_filter( 'allowed_block_types_all', $this->filter_allowed_block_types( ... ), 10, 2 );
 		add_filter( '_wp_post_revision_fields', $this->filter_revision_fields( ... ), 10, 2 );
 	}
@@ -33,7 +39,7 @@ final class Code_Embed_Post_Type implements Feature {
 	 */
 	public function register_post_type(): void {
 		register_post_type(
-			'secure_code_embed', // Code_Embed::POST_TYPE; a literal so the slug can be validated.
+			'secure_code_embed',
 			[
 				'labels'                => [
 					'name'                     => __( 'Code Embeds', 'wp-secure-code-embeds' ),
@@ -70,7 +76,7 @@ final class Code_Embed_Post_Type implements Feature {
 				'show_in_nav_menus'     => false,
 				'show_in_admin_bar'     => false,
 				'show_in_rest'          => true,
-				'rest_base'             => Code_Embed::REST_BASE,
+				'rest_base'             => 'secure-code-embeds',
 				'rest_controller_class' => Code_Embeds_REST_Controller::class,
 				'menu_icon'             => 'dashicons-editor-code',
 				'hierarchical'          => false,
@@ -79,27 +85,68 @@ final class Code_Embed_Post_Type implements Feature {
 				'query_var'             => false,
 				'delete_with_user'      => false,
 				'supports'              => [ 'title', 'editor', 'revisions', 'custom-fields' ],
-				'map_meta_cap'          => true,
+				'map_meta_cap'          => false,
 				'capabilities'          => [
 					'read'                   => 'read',
-					'create_posts'           => Code_Embed::CAPABILITY,
-					'edit_posts'             => Code_Embed::CAPABILITY,
-					'edit_others_posts'      => Code_Embed::CAPABILITY,
-					'edit_private_posts'     => Code_Embed::CAPABILITY,
-					'edit_published_posts'   => Code_Embed::CAPABILITY,
-					'publish_posts'          => Code_Embed::CAPABILITY,
-					'read_private_posts'     => Code_Embed::CAPABILITY,
-					'delete_posts'           => Code_Embed::CAPABILITY,
-					'delete_others_posts'    => Code_Embed::CAPABILITY,
-					'delete_private_posts'   => Code_Embed::CAPABILITY,
-					'delete_published_posts' => Code_Embed::CAPABILITY,
+					'edit_post'              => 'manage_secure_code_embeds',
+					'read_post'              => 'manage_secure_code_embeds',
+					'delete_post'            => 'manage_secure_code_embeds',
+					'create_posts'           => 'manage_secure_code_embeds',
+					'edit_posts'             => 'manage_secure_code_embeds',
+					'edit_others_posts'      => 'manage_secure_code_embeds',
+					'edit_private_posts'     => 'manage_secure_code_embeds',
+					'edit_published_posts'   => 'manage_secure_code_embeds',
+					'publish_posts'          => 'manage_secure_code_embeds',
+					'read_private_posts'     => 'manage_secure_code_embeds',
+					'delete_posts'           => 'manage_secure_code_embeds',
+					'delete_others_posts'    => 'manage_secure_code_embeds',
+					'delete_private_posts'   => 'manage_secure_code_embeds',
+					'delete_published_posts' => 'manage_secure_code_embeds',
 				],
 				'template'              => [
-					[ Code_Embed::FIELDS_BLOCK ],
+					[ 'wp-secure-code-embeds/code-embed-fields' ],
 				],
 				'template_lock'         => 'all',
 			]
 		);
+	}
+
+	/**
+	 * Register the meta that holds each entry's head and body code.
+	 *
+	 * The code is stored exactly as written. It is only exposed over REST in
+	 * the `edit` context, which requires the authoring capability.
+	 */
+	public function register_meta(): void {
+		$meta = [
+			'secure_code_embed_head' => [
+				'label'       => __( 'Head content', 'wp-secure-code-embeds' ),
+				'description' => __( 'Raw code output in the document head of pages that include this code embed. Not sanitized or escaped.', 'wp-secure-code-embeds' ),
+			],
+			'secure_code_embed_body' => [
+				'label'       => __( 'Body content', 'wp-secure-code-embeds' ),
+				'description' => __( 'Raw code output where the Code Embed block is placed. Not sanitized or escaped.', 'wp-secure-code-embeds' ),
+			],
+		];
+
+		foreach ( $meta as $key => $args ) {
+			register_post_meta(
+				'secure_code_embed',
+				$key,
+				[
+					...$args,
+					'type'              => 'string',
+					'single'            => true,
+					'default'           => '',
+					'revisions_enabled' => true,
+					'show_in_rest'      => [
+						'schema' => [
+							'context' => [ 'edit' ],
+						],
+					],
+				],
+			);
+		}
 	}
 
 	/**
@@ -110,11 +157,11 @@ final class Code_Embed_Post_Type implements Feature {
 	 */
 	public function filter_allowed_block_types( mixed $allowed_block_types, mixed $context ): mixed {
 		if (
-		$context instanceof WP_Block_Editor_Context
-		&& $context->post instanceof WP_Post
-		&& Code_Embed::POST_TYPE === $context->post->post_type
+			$context instanceof WP_Block_Editor_Context
+			&& $context->post instanceof WP_Post
+			&& 'secure_code_embed' === $context->post->post_type
 		) {
-			return [ Code_Embed::FIELDS_BLOCK ];
+			return [ 'wp-secure-code-embeds/code-embed-fields' ];
 		}
 
 		return $allowed_block_types;
@@ -123,10 +170,9 @@ final class Code_Embed_Post_Type implements Feature {
 	/**
 	 * Show the head and body code on the revisions screen.
 	 *
-	 * Revision storage and restoration for the meta fields is handled by core
-	 * through `revisions_enabled` in `config/post-meta.json`. This only adds the
-	 * fields to the comparison screen so changes can be reviewed before
-	 * restoring.
+	 * Core stores and restores revisioned meta on its own. This only adds the
+	 * meta to the comparison screen, using the labels it was registered with,
+	 * so changes can be reviewed before restoring.
 	 *
 	 * @param mixed $fields Revision fields, keyed by field name.
 	 * @param mixed $post   The post being revisioned, as an object or array.
@@ -142,16 +188,19 @@ final class Code_Embed_Post_Type implements Feature {
 			default                  => '',
 		};
 
-		// Core stores the filtered fields in a static variable that is reused
-		// for later posts, so remove the fields for other post types.
-		if ( Code_Embed::POST_TYPE !== $post_type ) {
-			unset( $fields[ Code_Embed::HEAD_META_KEY ], $fields[ Code_Embed::BODY_META_KEY ] );
+		foreach ( get_registered_meta_keys( 'post', 'secure_code_embed' ) as $key => $args ) {
+			if ( empty( $args['revisions_enabled'] ) || ! is_string( $args['label'] ?? null ) ) {
+				continue;
+			}
 
-			return $fields;
+			// Core stores the filtered fields in a static variable that is reused
+			// for later posts, so remove the fields for other post types.
+			if ( 'secure_code_embed' === $post_type ) {
+				$fields[ $key ] = $args['label'];
+			} else {
+				unset( $fields[ $key ] );
+			}
 		}
-
-		$fields[ Code_Embed::HEAD_META_KEY ] = __( 'Head content', 'wp-secure-code-embeds' );
-		$fields[ Code_Embed::BODY_META_KEY ] = __( 'Body content', 'wp-secure-code-embeds' );
 
 		return $fields;
 	}
