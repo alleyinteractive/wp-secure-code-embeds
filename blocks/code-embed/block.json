@@ -10,7 +10,7 @@
 	"keywords": [ "html", "css", "javascript", "custom", "code" ],
 	"textdomain": "wp-secure-code-embeds",
 	"attributes": {
-		"embedId": {
+		"ref": {
 			"type": "integer",
 			"default": 0
 		}

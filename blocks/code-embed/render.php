@@ -30,7 +30,7 @@ if ( ! is_string( $code_embed_post_type ) || ! in_array( $code_embed_post_type, 
 	return;
 }
 
-$code_embed_id = isset( $attributes['embedId'] ) && is_numeric( $attributes['embedId'] ) ? (int) $attributes['embedId'] : 0;
+$code_embed_id = isset( $attributes['ref'] ) && is_numeric( $attributes['ref'] ) ? (int) $attributes['ref'] : 0;
 $code_embed    = $code_embed_id > 0 ? get_post( $code_embed_id ) : null;
 
 if ( ! $code_embed instanceof WP_Post || 'secure_code_embed' !== $code_embed->post_type || 'publish' !== $code_embed->post_status ) {

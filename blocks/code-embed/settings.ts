@@ -1,8 +1,5 @@
 export interface CodeEmbedSettings {
-  adminUrl: string;
-  canInsert: boolean;
-  postType: string;
-  restBase: string;
+  allowedPostTypes: string[];
 }
 
 declare global {
@@ -12,16 +9,12 @@ declare global {
 }
 
 /**
- * Get the settings that the server passes to the editor script.
+ * Get the post types where code embeds can be placed, as passed by the server.
  *
- * @return {CodeEmbedSettings} Settings, with defaults for anything missing.
+ * @return {string[]} Post type slugs, or none if the server passed nothing.
  */
-export function getSettings(): CodeEmbedSettings {
-  return {
-    adminUrl: '/wp-admin/',
-    canInsert: false,
-    postType: 'secure_code_embed',
-    restBase: 'secure-code-embeds',
-    ...window.wpSecureCodeEmbeds,
-  };
+export function getAllowedPostTypes(): string[] {
+  const postTypes = window.wpSecureCodeEmbeds?.allowedPostTypes;
+
+  return Array.isArray(postTypes) ? postTypes : [];
 }

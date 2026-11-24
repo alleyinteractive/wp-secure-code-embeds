@@ -77,7 +77,7 @@ warning in the editor and renders nothing on the front end.
 
 On the front end:
 
-- Before the `<head>` is output, the page's blocks are parsed, including nested
+- Before the `<head>` is output, the page's blocks are scanned, including nested
   blocks and synced patterns, and the head content of every referenced entry is
   added to `<head>`. An entry used more than once has its head content added
   only once.

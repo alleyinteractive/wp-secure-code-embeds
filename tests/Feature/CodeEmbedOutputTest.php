@@ -43,7 +43,7 @@ class CodeEmbedOutputTest extends TestCase {
 	 * @param int $embed_id Entry ID.
 	 */
 	protected function picker( int $embed_id ): string {
-		return sprintf( '<!-- wp:wp-secure-code-embeds/code-embed {"embedId":%d} /-->', $embed_id );
+		return sprintf( '<!-- wp:wp-secure-code-embeds/code-embed {"ref":%d} /-->', $embed_id );
 	}
 
 	/**
@@ -246,16 +246,11 @@ class CodeEmbedOutputTest extends TestCase {
 		$this->assertMatchesRegularExpression( '/Above.*class="fullpage".*Below/s', $html );
 	}
 
-	public function test_picker_can_only_be_inserted_in_allowed_post_types(): void {
-		require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
-		require_once ABSPATH . 'wp-admin/includes/screen.php';
+	public function test_editor_settings_list_the_allowed_post_types(): void {
+		$this->assertSame( [ 'page' ], new Code_Embed_Block_Settings()->get_settings()['allowedPostTypes'] );
 
-		set_current_screen( 'page' );
-		$this->assertTrue( new Code_Embed_Block_Settings()->get_settings()['canInsert'] );
+		add_filter( 'wp_secure_code_embeds_allowed_post_types', fn (): array => [ 'page', 'post' ] );
 
-		set_current_screen( 'post' );
-		$this->assertFalse( new Code_Embed_Block_Settings()->get_settings()['canInsert'] );
-
-		set_current_screen( 'front' );
+		$this->assertSame( [ 'page', 'post' ], new Code_Embed_Block_Settings()->get_settings()['allowedPostTypes'] );
 	}
 }

@@ -87,8 +87,8 @@ The plugin's purpose: administrators author raw head/body code in a private post
 - `src/class-code-embeds-rest-controller.php` — limits REST reads to users who can select entries.
 - `Authoring_Capability` — the single trust boundary: grants `manage_secure_code_embeds` to users with `manage_options`.
 - `Code_Embed_Post_Type` — registers `secure_code_embed` and its head/body meta (labels included, revisioned), maps every capability (with `map_meta_cap` off) to `manage_secure_code_embeds`, locks its editor to the `code-embed-fields` block, and shows meta on the revisions screen.
-- `Code_Embed_Block_Settings` — passes settings to the picker block's editor script, including whether it can be inserted on the current screen.
-- `Inject_Head_Content` — parses the page's blocks (nested blocks and synced patterns included) once per request and prints each entry's head code once on `wp_head`.
+- `Code_Embed_Block_Settings` — passes the allowed post types to the picker block's editor script. The script checks them against the post open in the editor through the `blockEditor.__unstableCanInsertBlockType` filter, so insertion stays correct after in-editor navigation.
+- `Inject_Head_Content` — scans the page's content once per request with `WP_Block_Processor` (after a cheap `has_block()` check), following synced patterns, and prints each entry's head code once on `wp_head`. The picker stores the entry ID in a `ref` attribute, like `core/block`.
 - Blocks: `blocks/code-embed` (picker; `render.php` decides whether body code is output) and `blocks/code-embed-fields` (editor-only, edits meta).
 
 Post type, meta keys, capability, and block names are string literals rather than shared constants.

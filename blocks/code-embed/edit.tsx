@@ -14,13 +14,11 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import type { ComponentProps } from 'react';
 
-import { getSettings } from './settings';
-
 import './index.scss';
 
 interface EditProps {
   attributes: {
-    embedId: number;
+    ref: number;
   };
   setAttributes: (newAttributes: Partial<EditProps['attributes']>) => void;
 }
@@ -35,7 +33,7 @@ interface CodeEmbedRecord {
 
 type PreviewPost = ReturnType<NonNullable<ComponentProps<typeof PostPicker>['previewLookup']>>;
 
-const { adminUrl, postType, restBase } = getSettings();
+const POST_TYPE = 'secure_code_embed';
 const QUERY = { context: 'view' };
 
 /**
@@ -79,12 +77,12 @@ function renderSearchResult(post: object) {
  */
 export default function Edit({
   attributes: {
-    embedId,
+    ref,
   },
   setAttributes,
 }: EditProps) {
   const { embed, hasResolved, canEdit } = useSelect((select) => {
-    if (!embedId) {
+    if (!ref) {
       return { embed: undefined, hasResolved: true, canEdit: false };
     }
 
@@ -95,36 +93,39 @@ export default function Edit({
     } = select(coreStore);
 
     return {
-      embed: getEntityRecord('postType', postType, embedId, QUERY) as CodeEmbedRecord | undefined,
-      hasResolved: hasFinishedResolution('getEntityRecord', ['postType', postType, embedId, QUERY]),
-      canEdit: !!canUser('update', { kind: 'postType', name: postType, id: embedId }),
+      embed: getEntityRecord('postType', POST_TYPE, ref, QUERY) as CodeEmbedRecord | undefined,
+      hasResolved: hasFinishedResolution('getEntityRecord', ['postType', POST_TYPE, ref, QUERY]),
+      canEdit: !!canUser('update', { kind: 'postType', name: POST_TYPE, id: ref }),
     };
-  }, [embedId]);
+  }, [ref]);
 
   const isAvailable = !!embed && embed.status === 'publish';
-  const editUrl = addQueryArgs(`${adminUrl}post.php`, { post: embedId, action: 'edit' });
+  // Open the entry in its own editor, where its block lock applies, rather
+  // than navigating within this editor, which keeps the current page's
+  // settings. The editor always runs in wp-admin, so the URL is relative.
+  const editUrl = addQueryArgs('post.php', { post: ref, action: 'edit' });
 
   const picker = (
     <PostPicker
-      allowedTypes={[postType]}
+      allowedTypes={[POST_TYPE]}
       modalFormat="list"
       modalTitle={__('Select a code embed', 'wp-secure-code-embeds')}
-      onReset={() => setAttributes({ embedId: 0 })}
-      onUpdate={(id: number) => setAttributes({ embedId: id })}
+      onReset={() => setAttributes({ ref: 0 })}
+      onUpdate={(id: number) => setAttributes({ ref: id })}
       // Return null while loading and undefined when the entry can't be loaded.
       previewLookup={() => (
         (embed ?? (hasResolved ? undefined : null)) as unknown as PreviewPost
       )}
       previewRender={renderPreview}
-      searchEndpoint={`/wp/v2/${restBase}`}
+      searchEndpoint="/wp/v2/secure-code-embeds"
       searchRender={renderSearchResult}
-      value={embedId}
+      value={ref}
     />
   );
 
   let content;
 
-  if (!embedId) {
+  if (!ref) {
     content = (
       <>
         <p>{__('Select a code embed to place on this page.', 'wp-secure-code-embeds')}</p>
