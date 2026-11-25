@@ -19,6 +19,7 @@ function main(): void {
 		new Features\Authoring_Capability(),
 		new Features\Code_Embed_Post_Type(),
 		new Features\Code_Embed_Block_Settings(),
+		new Features\Code_Embed_Code_Editor(),
 		new Features\Inject_Head_Content(),
 	);
 
