@@ -1,0 +1,17 @@
+.wp-block-wp-secure-code-embeds-code-embed-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  textarea {
+    font-family: Menlo, Consolas, Monaco, 'Liberation Mono', 'Lucida Console', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  .components-notice {
+    margin: 0;
+  }
+}

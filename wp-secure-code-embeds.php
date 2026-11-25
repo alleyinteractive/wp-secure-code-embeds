@@ -3,10 +3,10 @@
  * Plugin Name: Secure Code Embeds
  * Plugin URI: https://github.com/alleyinteractive/wp-secure-code-embeds
  * Description: A WordPress plugin to allow authors and editors to securely embed admin-approved code via the block editor
- * Version: 0.0.0
+ * Version: 0.1.0
  * Author: Alley
  * Author URI: https://github.com/alleyinteractive/wp-secure-code-embeds
- * Requires at least: 7.1
+ * Requires at least: 7.0
  * Requires PHP: 8.4
  * Tested up to: 7.1
  *
@@ -54,9 +54,7 @@ if ( ! file_exists( __DIR__ . '/vendor/wordpress-autoload.php' ) ) {
 
 // Load the plugin's main files.
 require_once __DIR__ . '/src/assets.php';
-require_once __DIR__ . '/src/meta.php';
+require_once __DIR__ . '/src/functions.php';
 require_once __DIR__ . '/src/main.php';
 
-register_post_meta_from_defs();
-register_term_meta_from_defs();
 main();

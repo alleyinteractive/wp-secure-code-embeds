@@ -28,11 +28,96 @@ composer require alleyinteractive/wp-secure-code-embeds
 
 ## Usage
 
-Activate the plugin in WordPress and use it like so:
+Secure Code Embeds lets a site publish custom HTML, CSS, and JavaScript, such as
+contest pages, promotional landing pages, and embedded widgets, without a
+development cycle and without opening raw-HTML authoring to everyone who can
+edit pages.
+
+It separates two roles:
+
+- **Authoring** code is limited to site administrators (and super admins on
+  multisite) in a private "Code Embeds" content type.
+- **Placing** that code on a page is open to anyone who can edit pages, through
+  the Code Embed block.
+
+### Authoring a code embed
+
+Administrators find **Code Embeds** in the admin menu. Each entry has a title
+and one locked block with two fields:
+
+- **Head content** is output in the document `<head>` of every page that
+  includes the entry. Use it for CSS, web fonts, and scripts that must run
+  before the page body.
+- **Body content** is output wherever the Code Embed block is placed.
+
+Both fields are saved to post meta (`secure_code_embed_head` and
+`secure_code_embed_body`) and are revisioned with the entry, so changes can be
+compared and rolled back from the revisions screen.
+
+> [!IMPORTANT]
+> Code is stored and output exactly as written. It is intentionally not run
+> through `unfiltered_html` checks, sanitized, or escaped. Users with the
+> authoring capability are trusted to review code before saving it. Do not add
+> sanitization or escaping to these fields.
+
+Entries are private: they have no front-end URL, archive, or search results,
+and they belong to a single site on multisite.
+
+### Placing a code embed
+
+Insert the **Code Embed** block on a page and select an entry. The block can be
+the only content on a page or sit alongside other blocks, can be nested in
+groups, columns, and synced patterns, and can be used more than once on the
+same page.
+
+In the editor, the block shows the entry title, a link to edit the entry (for
+administrators), and a note that the code renders on the front end and in
+previews. If the entry is deleted, trashed, or unpublished, the block shows a
+warning in the editor and renders nothing on the front end.
+
+On the front end:
+
+- Before the `<head>` is output, the page's blocks are scanned, including nested
+  blocks and synced patterns, and the head content of every referenced entry is
+  added to `<head>`. An entry used more than once has its head content added
+  only once.
+- Body content renders, unescaped, at each block's position.
+- Nothing is output on password-protected pages until the password is entered,
+  or in feeds.
+- The Code Embed block works on pages using any template.
+
+### Permissions
+
+| Action | Who |
+| --- | --- |
+| Create, edit, or delete entries | Users with `manage_secure_code_embeds` |
+| Select entries in the block, read published entries over REST | Users who can edit pages (or any allowed post type) |
+| Read entries over REST | No one else, including logged-out users |
+
+`manage_secure_code_embeds` is granted to every user who has `manage_options`
+(site administrators). Super admins have it on every site. To give the
+capability to another role, or take it away from administrators, set it
+explicitly on the role:
 
 ```php
-$plugin = Create_WordPress_Plugin\Secure_Code_Embeds\Secure_Code_Embeds();
-$plugin->perform_magic();
+get_role( 'administrator' )->add_cap( 'manage_secure_code_embeds', false );
+```
+
+Head and body code are only returned by the REST API in the `edit` context,
+which requires the authoring capability.
+
+### Filters
+
+`wp_secure_code_embeds_allowed_post_types` sets the post types where the Code
+Embed block can be inserted and rendered, and where head content is injected.
+It defaults to `[ 'page' ]`, which keeps raw code out of feeds and syndicated
+content.
+
+```php
+add_filter(
+	'wp_secure_code_embeds_allowed_post_types',
+	fn ( array $post_types ) => [ ...$post_types, 'landing_page' ],
+);
 ```
 
 ## Development
@@ -50,31 +135,6 @@ while also running the front-end assets build process. You can also run `npm run
 start` to start the front-end assets build process separately. The front-end
 assets will be compiled into the `build` directory and will be enqueued
 automatically by the plugin.
-
-## Registering Meta
-
-The plugin supports registering post and term meta via JSON files located in the
-`config` directory. Out of the box, the plugin will look for
-`config/post-meta.json` for post meta and `config/term-meta.json` for term meta.
-
-```json
-{
-  "$schema": "https://mantle.alley.com/schema/meta.json",
-  "example_meta_key": {
-    "post_types": "article",
-    "type": "string"
-  },
-  "another_meta_key": {
-    "post_types": [ "article", "page" ],
-    "type": "number",
-    "single": false,
-    "default": 0
-  }
-}
-```
-
-For more information on how to register meta via JSON files,
-[see the documentation](https://mantle.alley.com/docs/features/support/helpers#register_meta_from_file).
 
 ## The `entries` directory and entry points
 
@@ -145,7 +205,8 @@ happen when running development or production builds.
 
 Run `composer test` to run tests against PHPUnit and the PHP code in the plugin.
 Unit testing code is written in PSR-4 format and can be found in the `tests`
-directory.
+directory. Run `npm run build` before the PHP tests so the blocks are
+registered; block rendering tests are skipped otherwise.
 
 ## Releasing the Plugin
 
