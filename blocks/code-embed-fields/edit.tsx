@@ -1,7 +1,9 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { Notice, TextareaControl } from '@wordpress/components';
+import { Notice } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+
+import CodeEditorControl from './code-editor-control';
 
 import './index.scss';
 
@@ -44,28 +46,24 @@ export default function Edit({ context: { postId, postType = 'secure_code_embed'
           'wp-secure-code-embeds',
         )}
       </Notice>
-      <TextareaControl
-        __nextHasNoMarginBottom
+      <CodeEditorControl
         help={__(
           'Output in the document <head> of every page that includes this code embed, once per page. Use it for CSS, web fonts, and scripts that must load before the page body.',
           'wp-secure-code-embeds',
         )}
         label={__('Head content', 'wp-secure-code-embeds')}
+        minLines={12}
         onChange={(value: string) => setValue(HEAD_META_KEY, value)}
-        rows={12}
-        spellCheck={false}
         value={getValue(HEAD_META_KEY)}
       />
-      <TextareaControl
-        __nextHasNoMarginBottom
+      <CodeEditorControl
         help={__(
           'Output wherever the Code Embed block is placed on a page.',
           'wp-secure-code-embeds',
         )}
         label={__('Body content', 'wp-secure-code-embeds')}
+        minLines={24}
         onChange={(value: string) => setValue(BODY_META_KEY, value)}
-        rows={24}
-        spellCheck={false}
         value={getValue(BODY_META_KEY)}
       />
     </div>
