@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "wp-secure-code-embeds/code-embed",
+  "version": "96caefdcc51df0461df4",
+  "title": "Code Embed",
+  "category": "embed",
+  "icon": "editor-code",
+  "description": "Place an administrator-approved code embed on this page.",
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "custom",
+    "code"
+  ],
+  "textdomain": "wp-secure-code-embeds",
+  "attributes": {
+    "ref": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
+  "editorScript": "file:index.js",
+  "editorStyle": "file:index.css",
+  "render": "file:render.php"
+}
